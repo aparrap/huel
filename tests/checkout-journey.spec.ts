@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/appFixtures';
+import { test, expect } from '../fixtures/AppFixtures';
 
 test.describe('E2E: Huel Powder Purchase Journeys', () => {
 
