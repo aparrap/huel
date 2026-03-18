@@ -15,7 +15,6 @@ export default (page: Page) => {
         const increaseButton = page.getByTestId(`increase-${flavorName}-quantity`);
         
         // Ensure the flavor is visible before interacting
-        await increaseButton.scrollIntoViewIfNeeded();
         await increaseButton.click();
     }
 
