@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/AppFixtures';
+import { test, expect } from '../../src/fixtures/AppFixtures';
 
 test.describe('E2E: Huel Powder Purchase Flow', () => {
 
