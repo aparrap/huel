@@ -26,11 +26,9 @@ huel-automation/
 ├── src/
 │   ├── pages/            # Page Object Model classes (Locators and Actions)
 │   ├── fixtures/         # Playwright custom fixtures (Dependency Injection)
-│   └── utils/            # Helper functions (Data generation, API calls)
 ├── tests/
 │   ├── e2e/              # End-to-End user journeys (e.g., Guest Checkout)
 │   └── component/        # Isolated component tests (e.g., Cart Drawer functionality)
-├── test-data/            # Static JSON files for data-driven testing
 ├── playwright.config.ts  # Global Playwright configuration (Browsers, Viewports, Retries)
 ├── package.json          # Project dependencies and scripts
 └── README.md             # This file
@@ -45,7 +43,7 @@ huel-automation/
 ### Installation
 1. Clone the repository:
 ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/aparrap/huel.git
    cd huel-automation
 ```
 2. Install project dependencies:
