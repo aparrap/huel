@@ -5,6 +5,7 @@ export default (page: Page) => {
         oneTimePurchaseOption: page.getByTestId('order-type-onetime'),
         addToCartButton: page.getByTestId('add-to-cart-button'),
         goToBasketPopupButton: page.getByRole('button', { name: 'Go to basket' }),
+        goToCartPopupButton: page.getByRole('button', { name: 'Go to cart' }),
     }
 
     /**
@@ -27,6 +28,7 @@ export default (page: Page) => {
         await elements.addToCartButton.click();
     }
 
+
     const proceedToBasketFromPopup = async () => {
         console.log('Waiting to see if Upsell Popup renders...');
         try {
@@ -35,6 +37,8 @@ export default (page: Page) => {
             await elements.goToBasketPopupButton.click();
         } catch (error) {
             console.log('No Upsell Popup detected (CI Environment). Proceeding directly to Cart Drawer validation...');
+            await elements.goToCartPopupButton.waitFor({ state: 'visible', timeout: 3000 }); 
+            await elements.goToCartPopupButton.click();
         }
     }
 
