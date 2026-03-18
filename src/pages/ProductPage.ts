@@ -20,7 +20,7 @@ export default (page: Page) => {
 
     const selectOneTimePurchase = async () => {
         await elements.oneTimePurchaseOption.scrollIntoViewIfNeeded();
-        await elements.oneTimePurchaseOption.click();
+        await elements.oneTimePurchaseOption.check({ force: true });
     }
 
     const addToBasket = async () => {
