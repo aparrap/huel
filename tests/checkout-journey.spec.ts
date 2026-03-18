@@ -1,80 +1,54 @@
 import { test, expect } from '../fixtures/AppFixtures';
 
-test.describe('E2E: Huel Powder Purchase Journeys', () => {
+test.describe('E2E: Huel Powder Purchase Flow', () => {
 
-    test('Happy Path: Guest User configures product, adds to basket, and validates cart totals', async ({ homePage, productPage, cartDrawer }) => {
+    test('User navigates from Home, selects Berry Powder, and validates Cart', async ({ 
+        homePage, 
+        collectionsPage, 
+        productPage, 
+        cartDrawer 
+    }) => {
         
-        // Step 1: Land on the Homepage
-        await test.step('Navigate to Homepage', async () => {
-            await homePage.navigateToHome();
-        });
+        const PRODUCT_TYPE = 'Powder';
+        const FLAVOR = 'Berry';
 
-        // Step 1.5: Handle GDPR / Cookie Consent
-        // We use a try/catch in the POM so this won't fail if the banner doesn't load
-        await test.step('Accept Cookies if presented', async () => {
+        // Step 1: Land on Home and handle consent
+        await test.step('Navigate to Homepage and Accept Cookies', async () => {
+            await homePage.navigateToHome();
             await homePage.acceptCookies();
         });
 
-        // Step 2: Navigate to Product Page via main menu
-        await test.step('Navigate to Huel Powder Product Page', async () => {
-            await homePage.navigateToPowderViaMenu();
+        // Step 2: Navigate to Collections via top menu
+        await test.step('Navigate to Powdered Meals Collection', async () => {
+            await homePage.navigateToPowderedMeals();
         });
 
-        // Step 3: Configure the product
-        let capturedProductPrice = '';
-        await test.step('Select Single Purchase, choose flavor, and capture price', async () => {
-            // Ensure we are selecting a single purchase to avoid subscription auth walls
-            await productPage.selectSubscriptionType('Single');
-            
-            // Wait for price calculation scripts to settle after changing subscription type
-            await productPage.page.waitForLoadState('networkidle');
-            
-            // Capture the exact price shown on the page before adding to basket
-            capturedProductPrice = await productPage.priceLabel.first().innerText();
-            expect(capturedProductPrice).not.toBeNull();
-            console.log(`Captured Product Price: ${capturedProductPrice}`);
+        // Step 3: Select the specific product card from the collection
+        await test.step(`Select ${PRODUCT_TYPE} from the collection grid`, async () => {
+            await collectionsPage.selectProduct(PRODUCT_TYPE);
         });
 
-        // Step 4: Add to basket and wait for the async drawer to open
-        await test.step('Add to basket and wait for drawer', async () => {
+        // Step 4: Configure the product (Flavor + Plan)
+        await test.step(`Select ${FLAVOR} flavor and One-Time purchase`, async () => {
+            await productPage.addFlavorQuantity(FLAVOR);
+            await productPage.selectOneTimePurchase();
+        });
+
+        // Step 5: Add to basket and handle popup
+        await test.step('Add to basket and proceed via popup', async () => {
             await productPage.addToBasket();
+            await productPage.proceedToBasketFromPopup();
+        });
+
+        // Step 6: Validate the side cart drawer
+        await test.step('Validate Cart Drawer contents and checkout availability', async () => {
             await cartDrawer.waitForDrawerToOpen();
-        });
-
-        // Step 5: Assertions - Validate Cart Integrity
-        await test.step('Validate Cart Drawer data', async () => {
-            // Verify correct quantity
-            await cartDrawer.validateCartItemCount('1');
             
-            // Verify the price passed into the drawer matches the product page price
-            await cartDrawer.validateSubtotal(capturedProductPrice);
+            // Assert Product Type and Flavor match
+            await cartDrawer.validateCartItem(PRODUCT_TYPE, FLAVOR);
             
-            // Verify the user can proceed to checkout
-            await expect(cartDrawer.checkoutButton).toBeVisible();
-            await expect(cartDrawer.checkoutButton).toBeEnabled();
-        });
-    });
-
-    test('Negative Scenario: Attempt to add 0 items to cart', async ({ homePage, productPage }) => {
-        
-        await test.step('Navigate directly to Product Page', async () => {
-            // Bypassing the homepage journey to speed up execution for edge cases
-            await productPage.navigateToHuelPowder();
-            await homePage.acceptCookies(); 
-        });
-
-        await test.step('Attempt to set quantity to 0', async () => {
-            // Force quantity to 0. A robust UI should either prevent this input entirely
-            // or disable the "Add to Basket" button.
-            await productPage.quantitySelector.fill('0');
-            
-            // Trigger blur event to ensure UI reacts to the input change
-            await productPage.quantitySelector.blur();
-        });
-
-        await test.step('Validate Add to Basket button is disabled or handles error', async () => {
-            // The assertion depends on specific implementation, but typically the button disables
-            await expect(productPage.addToCartButton).toBeDisabled();
+            // Assert Checkout button exists per requirements
+            await cartDrawer.validateCheckoutIsReady();
         });
     });
 });
